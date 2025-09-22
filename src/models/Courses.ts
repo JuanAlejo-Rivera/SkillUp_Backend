@@ -8,9 +8,9 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 
 
 export interface Icourse extends Document {
-    name: string,
+    courseName: string,
     description: string,
-    department: Types.ObjectId,
+    department: string,
 }
 
 
@@ -26,11 +26,12 @@ const courseSchema: Schema = new Schema({
         required: true,
         trim: true
     },
-    // department: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Department",
-    //     required: true
-    // },
+    department: {
+        // type: Schema.Types.ObjectId,
+        type: String,
+        ref: "Department",
+        required: true
+    },
     // lessons: [
     //     {
     //         title: { type: String, required: true },
