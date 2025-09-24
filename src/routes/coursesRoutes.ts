@@ -2,6 +2,8 @@ import express, { Router } from "express";
 import { body, param } from "express-validator";
 import { CouseController } from "../controllers/CousesController";
 import { handleInputErrors } from "../middleware/validation";
+import { SectionsController } from "../controllers/SectionsController";
+import { validateCourseExists } from "../middleware/courses";
 
 const router = Router()
 
@@ -53,7 +55,16 @@ router.delete('/:id',
 
 /**Routes for sections */
 
+router.post('/:courseId/sections',
+    body('title')
+        .notEmpty().withMessage('El nombre del curso es obligatorio'),
+    body('description')
+        .notEmpty().withMessage('La descripcion del curso es obligatoria'),
 
+    handleInputErrors,
+    validateCourseExists,
+    SectionsController.createSection
+)
 
 
 

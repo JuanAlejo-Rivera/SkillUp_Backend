@@ -19,7 +19,7 @@ const sectionSchema: Schema = new Schema({
         trim: true
     },
     course: {
-        type: Schema.Types.ObjectId,
+        type: Types.ObjectId,
         ref: "Course",
         required: true
     },
