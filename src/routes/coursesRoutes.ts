@@ -5,6 +5,9 @@ import { handleInputErrors } from "../middleware/validation";
 
 const router = Router()
 
+
+/** Routes for courses */ 
+
 router.post('/',
     body('courseName')
         .notEmpty().withMessage('El nombre del curso es obligatorio'),
@@ -46,6 +49,11 @@ router.delete('/:id',
     handleInputErrors,
     CouseController.deleteCourse
 )
+
+
+/**Routes for sections */
+
+
 
 
 
