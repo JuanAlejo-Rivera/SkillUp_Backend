@@ -4,6 +4,7 @@ import { CouseController } from "../controllers/CousesController";
 import { handleInputErrors } from "../middleware/validation";
 import { SectionsController } from "../controllers/SectionsController";
 import { validateCourseExists } from "../middleware/courses";
+import { validateSectionExists } from "../middleware/section";
 
 const router = Router()
 
@@ -55,6 +56,9 @@ router.delete('/:id',
 
 /**Routes for sections */
 
+router.param('courseId', validateCourseExists)
+router.param('sectionId', validateSectionExists)
+
 router.post('/:courseId/sections',
     body('title')
         .notEmpty().withMessage('El nombre del curso es obligatorio'),
@@ -62,8 +66,35 @@ router.post('/:courseId/sections',
         .notEmpty().withMessage('La descripcion del curso es obligatoria'),
 
     handleInputErrors,
-    validateCourseExists,
     SectionsController.createSection
+)
+
+router.get('/:courseId/sections',
+    SectionsController.getSectionsByCourse
+    
+)
+
+router.get('/:courseId/sections/:sectionId',
+    param('sectionId').isMongoId().withMessage('ID no valido'),
+    handleInputErrors,
+    SectionsController.getSectionById
+)
+
+router.put('/:courseId/sections/:sectionId',
+    param('sectionId').isMongoId().withMessage('ID no valido'),
+    body('title')
+        .notEmpty().withMessage('El nombre de la sección es obligatorio'),
+    body('description')
+        .notEmpty().withMessage('La descripcion de la sección es obligatoria'),
+
+    handleInputErrors,
+    SectionsController.updateSection
+)
+
+router.delete('/:courseId/sections/:sectionId',
+    param('sectionId').isMongoId().withMessage('ID no valido'),
+    handleInputErrors,
+    SectionsController.deleteSection
 )
 
 

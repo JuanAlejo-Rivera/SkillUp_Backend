@@ -21,33 +21,51 @@ export class SectionsController {
         }
     }
 
-    // static getSectionsByCourse = async (req: Request, res: Response) => {
-    //     const { courseId } = req.params
-    //     try {
-    //         const sections = await Section.find({ course: courseId }).populate('lessons')
-    //         res.json(sections)
-    //     } catch (error) {
-    //         console.log(error)
-    //         res.status(500).json({ error: 'Hubo un error al obtener las secciones' })
-    //     }
-    // }
+    static getSectionsByCourse = async (req: Request, res: Response) => {
+        try {
+            const sections = await Section.find({ course: req.course.id });
+            res.json(sections)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: 'Hubo un error al obtener las secciones' })
+        }
+    }
 
-    // static getSectionById = async (req: Request, res: Response) => {
-    //     const { sectionId } = req.params
-    //     try {
-    //         const section = await Section.findById(sectionId).populate('lessons')
-    //         if (!section) {
-    //             const error = new Error('Sección no encontrada')
-    //             return res.status(404).json({ error: error.message })
-    //         }
-    //         res.json(section)
-    //     } catch (error) {
-    //         console.log(error)
-    //         res.status(500).json({ error: 'Hubo un error al obtener la sección' })
-    //     }
-    // }
+    static getSectionById = async (req: Request, res: Response) => {
+        try {
+            //descomentar si quiero traer las lecciones, cuando las tega xD 
+            // const sections = await (await Section.findById(req.params.sectionId)).populated('lessons');
+            const section = await (await Section.findById(req.params.sectionId));
+            res.json(section)
+        } catch (error) {
+            res.status(500).json({ error: 'Hubo un error al obtener la sección' })
+        }
+    }
 
-    // static updateSection = async (req: Request, res: Response) => {
-    //     const { sectionId } = req.params
-    //     const { title, description 
+    static updateSection = async (req: Request, res: Response) => {
+        try {
+
+            const { title, description } = req.body;
+
+            req.section.title = title;
+            req.section.description = description;
+            await req.section.save();
+
+            res.send('Sección actualizada con éxito');
+
+        } catch (error) {
+            res.status(500).json({ error: 'Hubo un error al actualizar la sección' })
+        }
+    }
+
+    static deleteSection = async (req: Request, res: Response) => {
+        try {
+            req.course.sections = req.course.sections.filter(section => section.toString() !== req.section.id.toString())
+            await Promise.allSettled([req.section.deleteOne(), req.course.save()])
+
+            res.send('Sección eliminada con éxito');
+        } catch (error) {
+
+        }
+    }
 }
