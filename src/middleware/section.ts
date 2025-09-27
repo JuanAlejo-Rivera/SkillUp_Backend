@@ -16,11 +16,10 @@ export async function validateSectionExists(req: Request, res: Response, next: N
         const { sectionId } = req.params
         const section = await Section.findById(sectionId)
 
-            if(!section) {
-                 res.status(404).json({ error: 'Sección no encontrada' });
-                 return
-            }
-
+        if (!section) {
+            res.status(404).json({ error: 'Sección no encontrada' });
+            return
+        }
 
         req.section = section
         next()
@@ -29,4 +28,13 @@ export async function validateSectionExists(req: Request, res: Response, next: N
         res.status(500).json({ error: 'Hubo un error' })
 
     }
+}
+
+export function sectionBelongsToCourse(req: Request, res: Response, next: NextFunction) {
+    if (req.section.course.toString() !== req.course.id.toString()) {
+        const error = new Error('Acción no valida')
+        res.status(400).json({ error: error.message })
+        return
+    }
+    next()
 }

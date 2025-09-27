@@ -17,7 +17,7 @@ export async function validateCourseExists(req: Request, res: Response, next: Ne
         const course = await Course.findById(courseId)
 
         if (!course) {
-            const error = new Error('Proyecto no encontrado')
+            const error = new Error('Curso no encontrado')
             res.status(404).json({ error: error.message })
             return
         }
