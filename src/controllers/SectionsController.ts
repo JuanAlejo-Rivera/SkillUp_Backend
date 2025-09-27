@@ -23,7 +23,7 @@ export class SectionsController {
 
     static getSectionsByCourse = async (req: Request, res: Response) => {
         try {
-            const sections = await Section.find({ course: req.course.id });
+            const sections = await Section.find({ course: req.course.id }).populate('lessons');
             res.json(sections)
         } catch (error) {
             console.log(error)
@@ -33,9 +33,7 @@ export class SectionsController {
 
     static getSectionById = async (req: Request, res: Response) => {
         try {
-            //descomentar si quiero traer las lecciones, cuando las tega xD 
-            // const sections = await (await Section.findById(req.params.sectionId)).populated('lessons');
-            const section = await (await Section.findById(req.params.sectionId));
+            const section = await Section.findById(req.params.sectionId).populate('lessons');
             res.json(section)
         } catch (error) {
             res.status(500).json({ error: 'Hubo un error al obtener la sección' })
@@ -68,4 +66,5 @@ export class SectionsController {
 
         }
     }
+
 }
