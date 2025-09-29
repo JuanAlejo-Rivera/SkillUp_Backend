@@ -46,7 +46,6 @@ export class CouseController {
     static updateCourse = async (req: Request, res: Response) => {
 
         try {
-
             req.course.courseName = req.body.courseName
             req.course.description = req.body.description
             req.course.department = req.body.department
