@@ -44,17 +44,14 @@ export class CouseController {
     }
 
     static updateCourse = async (req: Request, res: Response) => {
-        const { id } = req.params
 
         try {
-            const course = await Course.findById(id)
 
-            if (!course) {
-                const error = new Error('Curso no encontrado')
-                res.status(404).json({ error: error.message })
-            }
+            req.course.courseName = req.body.courseName
+            req.course.description = req.body.description
+            req.course.department = req.body.department
 
-            await course.updateOne(req.body)
+            await req.course.save()
             res.send('Curso actualizado con éxito')
 
         } catch (error) {
@@ -64,17 +61,9 @@ export class CouseController {
 
     static deleteCourse = async (req: Request, res: Response) => {
 
-        const { id } = req.params
-
         try {
-            const course = await Course.findById(id)
 
-            if (!course) {
-                const error = new Error('Curso no encontrado')
-                res.status(404).json({ error: error.message })
-            }
-
-            await course.deleteOne()
+            await req.course.deleteOne()
             res.send('Curso eliminado con éxito')
 
         } catch (error) {

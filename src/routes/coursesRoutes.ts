@@ -33,8 +33,10 @@ router.get('/:id',
     CouseController.getCourseById
 )
 
-router.put('/:id',
-    param('id').isMongoId().withMessage('ID no valido'),
+router.param('courseId', validateCourseExists)
+
+router.put('/:courseId',
+    param('courseId').isMongoId().withMessage('ID no valido'),
 
     body('courseName')
         .notEmpty().withMessage('El nombre del curso es obligatorio'),
@@ -47,9 +49,8 @@ router.put('/:id',
     handleInputErrors,
     CouseController.updateCourse
 )
-router.delete('/:id',
-    param('id').isMongoId().withMessage('ID no valido'),
-
+router.delete('/:courseId',
+    param('courseId').isMongoId().withMessage('ID no valido'),
 
     handleInputErrors,
     CouseController.deleteCourse
@@ -58,7 +59,7 @@ router.delete('/:id',
 
 /**Routes for sections */
 
-router.param('courseId', validateCourseExists)
+
 router.param('sectionId', validateSectionExists)
 
 router.post('/:courseId/sections',
