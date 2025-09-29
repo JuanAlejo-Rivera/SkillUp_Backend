@@ -59,7 +59,6 @@ export class CouseController {
     }
 
     static deleteCourse = async (req: Request, res: Response) => {
-
         try {
 
             await req.course.deleteOne()
