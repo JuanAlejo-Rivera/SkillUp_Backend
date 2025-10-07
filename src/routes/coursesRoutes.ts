@@ -105,17 +105,38 @@ router.param('sectionId', sectionBelongsToCourse)
 router.param('lessonId', validateLessonExists)
 
 router.post('/:courseId/sections/:sectionId/lessons',
-    param('sectionId').isMongoId().withMessage('ID no valido'),
+    param('sectionId')
+        .isMongoId()
+        .withMessage('ID no válido'),
+
     body('title')
-        .notEmpty().withMessage('El nombre de la sección es obligatorio'),
+        .notEmpty()
+        .withMessage('El nombre de la sección es obligatorio'),
+
     body('description')
-        .notEmpty().withMessage('La descripcion de la sección es obligatoria'),
+        .notEmpty()
+        .withMessage('La descripción de la sección es obligatoria'),
+
     body('videoUrl')
-        .optional()
-        .isURL().withMessage('La URL del video no es válida'),
+        .optional({ checkFalsy: true })
+        .matches(
+            /^https?:\/\/[^\s]+\/[^\s]+\.(mp4|mov|avi|mkv|webm|flv)(?:\?.*)?$/i
+        )
+        .withMessage('La URL del video debe ser válida (.mp4, .mov, .avi, .mkv, .webm o .flv).'),
+
     body('fileUrl')
-        .optional()
-        .isURL().withMessage('La URL del archivo no es válida'),
+        .optional({ checkFalsy: true })
+        .matches(
+            /^https?:\/\/[^\s]+\/[^\s]+\.(pdf|docx?|pptx?|xlsx?)(?:\?.*)?$/i
+        )
+        .withMessage('La URL del archivo debe ser válida (.pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx).'),
+
+    body('imageUrl')
+        .optional({ checkFalsy: true })
+        .matches(
+            /^https?:\/\/[^\s]+\/[^\s]+\.(jpg|jpeg|png|gif|webp)(?:\?.*)?$/i
+        )
+        .withMessage('La URL de la imagen debe ser válida (.jpg, .jpeg, .png, .gif o .webp).'),
 
     handleInputErrors,
     LeassonController.createLesson

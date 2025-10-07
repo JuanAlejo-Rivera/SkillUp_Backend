@@ -10,13 +10,16 @@ export class LeassonController {
 
         try {
 
-            const { title, description, videoUrl, fileUrl } = req.body;
+                console.log("🧩 req.section:", req.section);
+    console.log("📦 Body:", req.body);
+            const { title, description, videoUrl, fileUrl, imageUrl } = req.body;
 
             const lesson = new Lesson({
                 title,
                 description,
                 videoUrl,
                 fileUrl,
+                imageUrl,
                 section: req.params.sectionId
             })
 

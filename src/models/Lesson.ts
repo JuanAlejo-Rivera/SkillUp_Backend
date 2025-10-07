@@ -27,6 +27,10 @@ const lessonSchema: Schema = new Schema(
             type: String,
             trim: true,
         },
+        imageUrl: {
+            type: String,
+            trim: true
+        },
         section: {
             type: Schema.Types.ObjectId,
             ref: "Section",
