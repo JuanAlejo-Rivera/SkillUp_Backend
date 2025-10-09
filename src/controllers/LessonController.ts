@@ -57,12 +57,14 @@ export class LeassonController {
     
     static updateLesson = async (req: Request, res: Response) => {
         try {
-            const { title, description, videoUrl, fileUrl } = req.body;
+            const { title, description, videoUrl, fileUrl, imageUrl} = req.body;
 
             req.lesson!.title = title;
             req.lesson!.description = description;
             req.lesson!.videoUrl = videoUrl;
             req.lesson!.fileUrl = fileUrl;
+            req.lesson!.imageUrl = imageUrl;
+
 
             await req.lesson!.save()
             res.send('Lección actualizada con éxito')

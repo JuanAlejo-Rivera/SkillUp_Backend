@@ -165,6 +165,9 @@ router.put('/:courseId/sections/:sectionId/lessons/:lessonId',
     body('fileUrl')
         .optional()
         .isURL().withMessage('La URL del archivo no es válida'),
+    body('imageUrl')
+        .optional()
+        .isURL().withMessage('La URL de la imagen no es válida'),
 
     handleInputErrors,
     LeassonController.updateLesson

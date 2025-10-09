@@ -5,6 +5,7 @@ export interface ILesson extends Document {
     description?: string;
     videoUrl?: string;   // URL del video (Cloudinary, YouTube, etc.)
     fileUrl?: string;    // Si quieres soportar documentos/PDF/imágenes
+    imageUrl?: string;
     section: Types.ObjectId; // Referencia a la sección padre
 }
 
