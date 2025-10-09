@@ -9,9 +9,6 @@ export class LeassonController {
     static createLesson = async (req: Request, res: Response) => {
 
         try {
-
-                console.log("🧩 req.section:", req.section);
-    console.log("📦 Body:", req.body);
             const { title, description, videoUrl, fileUrl, imageUrl } = req.body;
 
             const lesson = new Lesson({
@@ -35,7 +32,6 @@ export class LeassonController {
         }
     }
 
-    //Obtener tolas las lessons de una section
     static getLessonsBySection = async (req: Request, res: Response) => {
         try {
             const lessons = await Lesson.find({ section: req.params.sectionId })
