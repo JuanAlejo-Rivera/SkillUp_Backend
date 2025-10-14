@@ -9,7 +9,7 @@ export class LeassonController {
     static createLesson = async (req: Request, res: Response) => {
 
         try {
-            const { title, description, videoUrl, fileUrl, imageUrl } = req.body;
+            const { title, description, videoUrl = [], fileUrl = [], imageUrl = [] } = req.body;
 
             const lesson = new Lesson({
                 title,
@@ -50,16 +50,18 @@ export class LeassonController {
 
         }
     }
-    
+
     static updateLesson = async (req: Request, res: Response) => {
         try {
-            const { title, description, videoUrl, fileUrl, imageUrl} = req.body;
+            const { title, description, videoUrl, fileUrl, imageUrl } = req.body;
 
-            req.lesson!.title = title;
-            req.lesson!.description = description;
-            req.lesson!.videoUrl = videoUrl;
-            req.lesson!.fileUrl = fileUrl;
-            req.lesson!.imageUrl = imageUrl;
+            req.lesson!.title = title || req.lesson!.title;
+            req.lesson!.description = description || req.lesson!.description;
+
+            // Si el frontend envía arrays nuevos, los agrega sin eliminar los antiguos
+            if (videoUrl?.length) req.lesson!.videoUrl.push(...videoUrl);
+            if (fileUrl?.length) req.lesson!.fileUrl.push(...fileUrl);
+            if (imageUrl?.length) req.lesson!.imageUrl.push(...imageUrl);
 
 
             await req.lesson!.save()

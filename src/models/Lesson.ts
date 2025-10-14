@@ -3,10 +3,10 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface ILesson extends Document {
     title: string;
     description?: string;
-    videoUrl?: string;   // URL del video (Cloudinary, YouTube, etc.)
-    fileUrl?: string;    // Si quieres soportar documentos/PDF/imágenes
-    imageUrl?: string;
-    section: Types.ObjectId; // Referencia a la sección padre
+    videoUrl?: string[];
+    fileUrl?: string[];
+    imageUrl?: string[];
+    section: Types.ObjectId;
 }
 
 const lessonSchema: Schema = new Schema(
@@ -21,15 +21,15 @@ const lessonSchema: Schema = new Schema(
             trim: true,
         },
         videoUrl: {
-            type: String,
+            type: [String],
             trim: true,
         },
         fileUrl: {
-            type: String,
+            type: [String],
             trim: true,
         },
         imageUrl: {
-            type: String,
+            type: [String],
             trim: true
         },
         section: {
