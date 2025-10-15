@@ -55,23 +55,38 @@ export class LeassonController {
         try {
             const { title, description, videoUrl, fileUrl, imageUrl } = req.body;
 
-            req.lesson!.title = title || req.lesson!.title;
-            req.lesson!.description = description || req.lesson!.description;
+            req.lesson!.title = title;
+            req.lesson!.description = description ;
 
-            // Si el frontend envía arrays nuevos, los agrega sin eliminar los antiguos
-            if (videoUrl?.length) req.lesson!.videoUrl.push(...videoUrl);
-            if (fileUrl?.length) req.lesson!.fileUrl.push(...fileUrl);
-            if (imageUrl?.length) req.lesson!.imageUrl.push(...imageUrl);
+            if (videoUrl?.length) {
+                req.lesson!.videoUrl = Array.from(new Set([
+                    ...(req.lesson!.videoUrl || []),
+                    ...videoUrl
+                ]));
+            }
 
+            if (fileUrl?.length) {
+                req.lesson!.fileUrl = Array.from(new Set([
+                    ...(req.lesson!.fileUrl || []),
+                    ...fileUrl
+                ]));
+            }
 
-            await req.lesson!.save()
-            res.send('Lección actualizada con éxito')
+            if (imageUrl?.length) {
+                req.lesson!.imageUrl = Array.from(new Set([
+                    ...(req.lesson!.imageUrl || []),
+                    ...imageUrl
+                ]));
+            }
 
+            await req.lesson!.save();
+            res.send('Lección actualizada con éxito');
         } catch (error) {
-            res.status(500).json({ error: 'Hubo un error al actualizar la lección' })
-
+            console.error(error);
+            res.status(500).json({ error: 'Hubo un error al actualizar la lección' });
         }
-    }
+    };
+
 
     static deleteLesson = async (req: Request, res: Response) => {
         try {
