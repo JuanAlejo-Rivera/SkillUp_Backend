@@ -1,21 +1,19 @@
-import  express  from 'express';
-import dontenv from "dotenv";
-import cors from 'cors';
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
 import { corsConfig } from "./config/cors";
-import { conenctDB } from './config/db';
-import cousesRoutes from './routes/coursesRoutes';
+import { conenctDB } from "./config/db";
+import coursesRoutes from "./routes/coursesRoutes";
 
-
-
-dontenv.config();
+dotenv.config();
 conenctDB();
 
 const app = express();
-app.use(cors(corsConfig));
 
+app.use(cors(corsConfig));
 app.use(express.json());
 
-//Routes
-app.use('/api/courses', cousesRoutes)
+// Rutas
+app.use("/api/courses", coursesRoutes);
 
 export default app;
