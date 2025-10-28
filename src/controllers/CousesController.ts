@@ -19,7 +19,7 @@ export class CouseController {
 
     static getAllCourses = async (req: Request, res: Response) => {
         try {
-            const courses = await Course.find({})
+            const courses = await Course.find({}).populate('department');
             res.json(courses)
         } catch (error) {
             console.log(error)

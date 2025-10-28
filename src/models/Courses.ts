@@ -10,7 +10,7 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface Icourse extends Document {
     courseName: string,
     description: string,
-    department: mongoose.Types.ObjectId | string;
+    department: mongoose.Types.ObjectId;
     sections: Types.ObjectId[]
 }
 
@@ -29,7 +29,7 @@ const courseSchema: Schema = new Schema({
     },
     department: {
         // type: Schema.Types.ObjectId,
-        type: String,
+        type: Schema.Types.ObjectId,
         ref: "Department",
         required: true
     },
