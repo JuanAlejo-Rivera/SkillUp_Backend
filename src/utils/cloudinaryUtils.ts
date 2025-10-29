@@ -6,13 +6,14 @@
 export function extractPublicIdFromUrl(url: string): string | null {
     try {
         // Patrón para URLs de Cloudinary
-        const cloudinaryPattern = /cloudinary\.com\/[^\/]+\/(?:image|video|raw)\/upload\/(?:v\d+\/)?(.+?)(?:\.[^.]+)?$/;
+        // Ejemplo: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder/filename.jpg
+        const cloudinaryPattern = /cloudinary\.com\/[^\/]+\/(?:image|video|raw)\/upload\/(?:v\d+\/)?(.+)/;
         const match = url.match(cloudinaryPattern);
         
         if (match && match[1]) {
-            // Remueve parámetros de transformación si existen
-            const publicId = match[1].split('/').pop()?.split('.')[0];
-            return publicId || null;
+            // Remueve la extensión del archivo
+            const pathWithoutExtension = match[1].replace(/\.[^.]+$/, '');
+            return pathWithoutExtension;
         }
         
         return null;

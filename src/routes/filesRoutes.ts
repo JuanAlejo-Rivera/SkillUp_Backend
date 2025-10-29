@@ -30,7 +30,10 @@ router.delete('/delete-multiple',
 );
 
 // Eliminar archivo específico de una lección
-router.delete('/lesson/:lessonId/file',
+router.delete('/lesson/:sectionId/:lessonId/file',
+    param('sectionId')
+        .isMongoId()
+        .withMessage('ID de sección no válido'),
     param('lessonId')
         .isMongoId()
         .withMessage('ID de lección no válido'),
