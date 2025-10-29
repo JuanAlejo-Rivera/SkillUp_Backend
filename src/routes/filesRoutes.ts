@@ -6,6 +6,11 @@ import { validateLessonExists } from '../middleware/lesson';
 
 const router = Router();
 
+// TEST ROUTE - to verify routes are loading
+router.get('/test', (req, res) => {
+    res.json({ message: 'Files routes are working!' });
+});
+
 // Eliminar un archivo individual
 router.delete('/delete',
     body('url')
@@ -31,6 +36,11 @@ router.delete('/delete-multiple',
 
 // Eliminar archivo específico de una lección
 router.delete('/lesson/:sectionId/:lessonId/file',
+    (req, res, next) => {
+        console.log('🎯 Route hit! Params:', req.params);
+        console.log('Body:', req.body);
+        next();
+    },
     param('sectionId')
         .isMongoId()
         .withMessage('ID de sección no válido'),
