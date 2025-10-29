@@ -26,4 +26,9 @@ app.use("/api/courses", coursesRoutes);
 app.use("/api/departments", departmentsRoutes);
 app.use("/api/files", filesRoutes);
 
+console.log('✅ All routes mounted:');
+console.log('   - /api/courses');
+console.log('   - /api/departments');
+console.log('   - /api/files');
+
 export default app;

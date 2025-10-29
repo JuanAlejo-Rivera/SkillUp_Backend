@@ -6,8 +6,11 @@ import { validateLessonExists } from '../middleware/lesson';
 
 const router = Router();
 
+console.log('✅ filesRoutes.ts loaded and initialized');
+
 // TEST ROUTE - to verify routes are loading
 router.get('/test', (req, res) => {
+    console.log('🧪 Test route hit!');
     res.json({ message: 'Files routes are working!' });
 });
 
@@ -37,8 +40,13 @@ router.delete('/delete-multiple',
 // Eliminar archivo específico de una lección
 router.delete('/lesson/:sectionId/:lessonId/file',
     (req, res, next) => {
-        console.log('🎯 Route hit! Params:', req.params);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('🎯 DELETE ROUTE HIT!');
+        console.log('Full URL:', req.url);
+        console.log('Method:', req.method);
+        console.log('Params:', req.params);
         console.log('Body:', req.body);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         next();
     },
     param('sectionId')
@@ -55,9 +63,23 @@ router.delete('/lesson/:sectionId/:lessonId/file',
     body('fileType')
         .isIn(['video', 'image', 'file'])
         .withMessage('Tipo de archivo debe ser: video, image o file'),
+    (req, res, next) => {
+        console.log('⚡ Passed validation, moving to handleInputErrors');
+        next();
+    },
     handleInputErrors,
+    (req, res, next) => {
+        console.log('⚡ Passed handleInputErrors, moving to validateLessonExists');
+        next();
+    },
     validateLessonExists,
+    (req, res, next) => {
+        console.log('⚡ Passed validateLessonExists, moving to controller');
+        next();
+    },
     FileController.deleteFileFromLesson
 );
+
+console.log('✅ DELETE /lesson/:sectionId/:lessonId/file route registered');
 
 export default router;
