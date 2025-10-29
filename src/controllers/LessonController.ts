@@ -1,5 +1,6 @@
 import { json, Request, Response } from "express";
 import Lesson from "../models/Lesson";
+import { CloudinaryService } from "../services/CloudinaryService";
 
 
 
@@ -90,14 +91,38 @@ export class LeassonController {
 
     static deleteLesson = async (req: Request, res: Response) => {
         try {
+            const lesson = req.lesson;
+            
+            // Eliminar todos los archivos asociados de Cloudinary
+            const cloudinaryResult = await CloudinaryService.deleteLessonFiles(
+                lesson.videoUrl || [],
+                lesson.imageUrl || [],
+                lesson.fileUrl || []
+            );
+
+            // Log de archivos eliminados (opcional)
+            if (cloudinaryResult.failed.length > 0) {
+                console.warn('Algunos archivos no pudieron ser eliminados de Cloudinary:', cloudinaryResult.failed);
+            }
+
+            // Eliminar la lección de la sección
             req.section.lessons = req.section.lessons.filter(lesson => lesson.toString() !== req.lesson.id.toString())
 
+            // Eliminar la lección de la base de datos y actualizar la sección
             await Promise.allSettled([req.lesson!.deleteOne(), req.section.save()])
-            res.send('Lección eliminada con éxito')
+            
+            res.json({ 
+                message: 'Lección eliminada con éxito',
+                cloudinaryResult: {
+                    totalFiles: cloudinaryResult.summary.total,
+                    filesDeleted: cloudinaryResult.summary.successful,
+                    filesFailed: cloudinaryResult.summary.failed
+                }
+            })
 
         } catch (error) {
+            console.error('Error deleting lesson:', error);
             res.status(500).json({ error: 'Hubo un error al eliminar la lección' })
-
         }
     }
 }
