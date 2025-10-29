@@ -11,9 +11,22 @@ declare global {
 
 export async function validateLessonExists(req: Request, res: Response, next: NextFunction) {
     try {
-        const { lessonId, sectionId } = req.params;
+        const lessonId = req.params.lessonId;
+        const sectionIdFromParams = req.params.sectionId;
+        const sectionIdFromBody = typeof req.body?.sectionId === "string" ? req.body.sectionId.trim() : undefined;
+        const sectionId = sectionIdFromParams || sectionIdFromBody;
 
-        console.log('🔍 Validating lesson:', { lessonId, sectionId });
+        console.log('[LessonMiddleware] Validating lesson', { lessonId, sectionId });
+
+        if (!lessonId) {
+            res.status(400).json({ error: "ID de leccion es requerido" });
+            return;
+        }
+
+        if (!sectionId) {
+            res.status(400).json({ error: "ID de seccion es requerido" });
+            return;
+        }
 
         const lesson = await Lesson.findOne({
             _id: lessonId,
@@ -21,16 +34,15 @@ export async function validateLessonExists(req: Request, res: Response, next: Ne
         });
 
         if (!lesson) {
-            console.log('❌ Lesson not found with:', { lessonId, sectionId });
-            res.status(404).json({ error: "Lección no encontrada" });
-            return
+            console.log('[LessonMiddleware] Lesson not found', { lessonId, sectionId });
+            res.status(404).json({ error: "Leccion no encontrada" });
+            return;
         }
 
-        console.log('✅ Lesson found:', lesson._id);
         req.lesson = lesson;
         next();
     } catch (error) {
-        console.error('💥 Error in validateLessonExists:', error);
-        res.status(500).json({ error: "Hubo un error validando la lección" });
+        console.error("[LessonMiddleware] Error validating lesson", error);
+        res.status(500).json({ error: "Hubo un error validando la leccion" });
     }
 }
