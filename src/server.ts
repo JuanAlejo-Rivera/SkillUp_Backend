@@ -15,10 +15,15 @@ const app = express();
 app.use(cors(corsConfig));
 app.use(express.json());
 
+// Log all incoming requests
+app.use((req, res, next) => {
+    console.log(`📨 ${req.method} ${req.path}`);
+    next();
+});
+
 // Rutas
 app.use("/api/courses", coursesRoutes);
 app.use("/api/departments", departmentsRoutes);
-app.use("/api/files", filesRoutes);
 app.use("/api/files", filesRoutes);
 
 export default app;
