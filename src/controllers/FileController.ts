@@ -69,6 +69,10 @@ export class FileController {
      * Elimina un archivo específico de una lección y actualiza la base de datos
      */
     static deleteFileFromLesson = async (req: Request, res: Response) => {
+        console.log('🎯 deleteFileFromLesson controller called!');
+        console.log('Params:', req.params);
+        console.log('Body:', req.body);
+        
         try {
             const { url, fileType } = req.body; // fileType: 'video' | 'image' | 'file'
 
