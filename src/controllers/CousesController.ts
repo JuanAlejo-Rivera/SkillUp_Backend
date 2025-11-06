@@ -63,7 +63,6 @@ export class CouseController {
 
             await req.course.deleteOne()
             res.send('Curso eliminado con éxito')
-
         } catch (error) {
             console.log(error)
         }
