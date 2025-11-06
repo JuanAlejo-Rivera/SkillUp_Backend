@@ -41,7 +41,6 @@ export class DepartmentsController {
         } catch (error) {
             res.status(500).json({ error: 'Hubo un error al eliminar el departamento' })
         }
-
     }
 
 
