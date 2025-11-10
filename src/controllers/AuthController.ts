@@ -2,6 +2,8 @@ import { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import User from "../models/User";
 import { hashPassword } from "../utils/auth";
+import Token from "../models/Token";
+import { generateToken } from "../utils/token";
 
 
 
@@ -20,12 +22,19 @@ export class AuthController {
                 res.status(409).json({ error: error.message })
                 return;
             }
-
+            //Se crea el usuario
             const user = new User(req.body)
-
             //hashear el password
             user.password = await hashPassword(password)
-            await user.save();
+            //Generar token de confirmacion
+            const token = new Token()
+            token.token = generateToken() // primer token es la variable, .token es el campo del schema
+            token.user = user.id // al user del schema le asignamos el id generado por mongoose, para crear una cuenta nueva
+
+
+
+
+            await Promise.allSettled([user.save(), token.save()])
 
             res.send('Cuenta creada, verifica tu email para confirmarla')
         } catch (error) {
