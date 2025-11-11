@@ -4,12 +4,10 @@ import User from "../models/User";
 import { hashPassword } from "../utils/auth";
 import Token from "../models/Token";
 import { generateToken } from "../utils/token";
-
+import { AuthEmail } from "../emails/AuthEmail";
 
 
 export class AuthController {
-
-
 
     static createAccount = async (req: Request, res: Response) => {
         try {
@@ -30,9 +28,12 @@ export class AuthController {
             const token = new Token()
             token.token = generateToken() // primer token es la variable, .token es el campo del schema
             token.user = user.id // al user del schema le asignamos el id generado por mongoose, para crear una cuenta nueva
-
-
-
+            //enviar email
+            AuthEmail.sendConfirmationEmail({
+                email: user.email,
+                name: user.name,
+                token: token.token
+            })
 
             await Promise.allSettled([user.save(), token.save()])
 
@@ -40,6 +41,29 @@ export class AuthController {
         } catch (error) {
             res.status(500).json({ error: 'Error al crear la cuenta' });
 
+        }
+
+    }
+
+    static confirmAccount = async (req: Request, res: Response) => {
+        try {
+            const { token } = req.body;
+
+            const tokenExist = await Token.findOne({ token });
+            if (!tokenExist) {
+                const error = new Error('Token no valido');
+                res.status(401).json({ error: error.message })
+                return;
+            }
+
+            const user = await User.findById(tokenExist.user)
+            user.confirmed = true;
+
+            await Promise.allSettled([user.save(), tokenExist.deleteOne()])
+            res.json('cuanta confirmada correctamente');
+
+        } catch (error) {
+            res.status(500).json({ error: 'Error al crear la cuenta' });
         }
 
     }

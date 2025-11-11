@@ -18,7 +18,7 @@ const tokenSchema: Schema = new Schema({
     expiresAt: {
         type: Date,
         default: Date.now,
-        expires: "1d" //el usuario tiene 1 dia para confirmar su cuenta
+        expires: "1d" //el usuatio tiene 1 dia para confirmar su cuenta
     },
 })
 
