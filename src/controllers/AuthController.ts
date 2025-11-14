@@ -1,10 +1,11 @@
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import User from "../models/User";
-import { hashPassword } from "../utils/auth";
+import { checkPassword, hashPassword } from "../utils/auth";
 import Token from "../models/Token";
 import { generateToken } from "../utils/token";
 import { AuthEmail } from "../emails/AuthEmail";
+import { generateJWT } from "../utils/jwt";
 
 
 export class AuthController {
@@ -67,6 +68,53 @@ export class AuthController {
         }
 
     }
+
+       static login = async (req: Request, res: Response) => {
+        try {
+
+            const { email, password } = req.body;
+
+            //verificar si el usuario existe
+            const userExist = await User.findOne({ email });
+            if (!userExist) {
+                const error = new Error('Usuario no encontrado');
+                res.status(401).json({ error: error.message });
+                return;
+            }
+            if (!userExist.confirmed) {
+                const token = new Token();
+                token.user = userExist.id;
+                token.token = generateToken();
+                await token.save();
+
+                //enviar el email de confirmacion
+                AuthEmail.sendConfirmationEmail({
+                    email: userExist.email,
+                    name: userExist.name,
+                    token: token.token
+                })
+
+                const error = new Error('Tu cuenta no ha sido confirmada, hemos enviado un email de confirmacion');
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            //verificar el password
+            const isPasswordCorrect = await checkPassword(password, userExist.password)
+            if (!isPasswordCorrect) {
+                const error = new Error('Password incorrecto');
+                res.status(401).json({ error: error.message });
+                return;
+            }
+            const token = generateJWT({ id: userExist.id });
+            res.send(token)
+
+        } catch (error) {
+            res.status(500).json({ error: 'Hubo un error' });
+        }
+
+    }
+
 
 
 
