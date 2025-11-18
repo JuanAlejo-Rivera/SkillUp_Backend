@@ -126,8 +126,8 @@ export class AuthController {
                 res.status(409).json({ error: error.message })
                 return;
             }
-        
-            if(user.confirmed){
+
+            if (user.confirmed) {
                 const error = new Error('La cuenta ya ha sido confirmada')
                 res.status(409).json({ error: error.message })
                 return;
@@ -150,6 +150,85 @@ export class AuthController {
         } catch (error) {
             res.status(500).json({ error: 'Error al crear la cuenta' });
 
+        }
+
+    }
+
+    static forgotPassword = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body;
+
+            //usuiario existe 
+            const user = await User.findOne({ email })
+            if (!user) {
+                const error = new Error('El usuario no esta registrado')
+                res.status(409).json({ error: error.message })
+                return;
+            }
+
+
+            //Generar token de confirmacion
+            const token = new Token()
+            token.token = generateToken() // primer token es la variable, .token es el campo del schema
+            token.user = user.id // al user del schema le asignamos el id generado por mongoose, para crear una cuenta nueva
+            await token.save();
+
+            //enviar email
+            AuthEmail.sendPasswordResetToken({
+                email: user.email,
+                name: user.name,
+                token: token.token
+            })
+
+
+            res.send('Se envio un token a tu correo para reestablecer tu contraseña')
+        } catch (error) {
+            res.status(500).json({ error: 'Error al crear la cuenta' });
+
+        }
+
+    }
+
+    static validateToken = async (req: Request, res: Response) => {
+        try {
+            const { token } = req.body;
+
+            const tokenExist = await Token.findOne({ token });
+            if (!tokenExist) {
+                const error = new Error('Token no valido');
+                res.status(401).json({ error: error.message })
+                return;
+            }
+
+            res.json('Token Valido, define una nueva contraseña');
+
+        } catch (error) {
+            res.status(500).json({ error: 'Error al crear la cuenta' });
+        }
+
+    }
+
+    static updatepasswordWithToken = async (req: Request, res: Response) => {
+        try {
+            const { token } = req.params;
+            const { password } = req.body;
+
+            const tokenExist = await Token.findOne({ token });
+            if (!tokenExist) {
+                const error = new Error('Token no valido');
+                res.status(401).json({ error: error.message })
+                return;
+            }
+
+            const user = await User.findById(tokenExist.user);
+            user.password = await hashPassword(password); //esta es la nueva contraseña ingresada por el usuario
+
+            await Promise.allSettled([user.save(), tokenExist.deleteOne()])
+
+
+            res.json('La contraseña se actualizo correctamente');
+        } catch (error) {
+            res.status(500).json({ error: 'Error al crear la cuenta' });
         }
 
     }
