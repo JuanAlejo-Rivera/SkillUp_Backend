@@ -69,7 +69,7 @@ export class AuthController {
 
     }
 
-       static login = async (req: Request, res: Response) => {
+    static login = async (req: Request, res: Response) => {
         try {
 
             const { email, password } = req.body;
@@ -115,7 +115,44 @@ export class AuthController {
 
     }
 
+    static requestConfirmationCode = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body;
 
+            //usuiario existe 
+            const user = await User.findOne({ email })
+            if (!user) {
+                const error = new Error('El usuario no esta registrado')
+                res.status(409).json({ error: error.message })
+                return;
+            }
+        
+            if(user.confirmed){
+                const error = new Error('La cuenta ya ha sido confirmada')
+                res.status(409).json({ error: error.message })
+                return;
+            }
+
+            //Generar token de confirmacion
+            const token = new Token()
+            token.token = generateToken() // primer token es la variable, .token es el campo del schema
+            token.user = user.id // al user del schema le asignamos el id generado por mongoose, para crear una cuenta nueva
+            //enviar email
+            AuthEmail.sendConfirmationEmail({
+                email: user.email,
+                name: user.name,
+                token: token.token
+            })
+
+            await Promise.allSettled([user.save(), token.save()])
+
+            res.send('Se envio un nuevo token a tu correo')
+        } catch (error) {
+            res.status(500).json({ error: 'Error al crear la cuenta' });
+
+        }
+
+    }
 
 
 }
