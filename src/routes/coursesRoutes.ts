@@ -7,11 +7,14 @@ import { validateCourseExists } from "../middleware/courses";
 import { sectionBelongsToCourse, validateSectionExists } from "../middleware/section";
 import { LeassonController } from "../controllers/LessonController";
 import { validateLessonExists } from "../middleware/lesson";
+import { authenticate } from "../middleware/auth";
 
 const router = Router()
 
 
 /** Routes for courses */
+
+router.use(authenticate)// todas las rutas de este router pasaran por este middleware, para estar protegidas
 
 router.post('/',
     body('courseName')
@@ -25,7 +28,7 @@ router.post('/',
     CouseController.createCourse
 )
 
-router.get('/', CouseController.getAllCourses)
+router.get('/' ,CouseController.getAllCourses)
 
 router.get('/:id',
     param('id').isMongoId().withMessage('ID no valido'),

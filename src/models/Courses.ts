@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Schema, Document, Types, PopulatedDoc } from "mongoose";
+import { IUser } from "./User";
 
 // export interface Ilesson extends Document {
 //     title: string
@@ -12,6 +13,7 @@ export interface Icourse extends Document {
     description: string,
     department: mongoose.Types.ObjectId;
     sections: Types.ObjectId[]
+    manager: PopulatedDoc<IUser & Document>
 }
 
 
@@ -38,7 +40,11 @@ const courseSchema: Schema = new Schema({
             type: Schema.Types.ObjectId,
             ref: "Section" // referencia al modelo Lesson
         }
-    ]
+    ],
+    manager: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+    },
     // createdAt: {
     //     type: Date,
     //     default: Date.now

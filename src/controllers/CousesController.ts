@@ -8,6 +8,9 @@ export class CouseController {
 
         const course = new Course(req.body)
 
+        //asignar el manager del curso
+        course.manager = req.user.id
+
         try {
             await course.save()
             res.send('Curso creado con éxito')
@@ -20,6 +23,12 @@ export class CouseController {
     static getAllCourses = async (req: Request, res: Response) => {
         try {
             const courses = await Course.find({}).populate('department');
+            // const courses = await Course.find({
+            //     $or: [
+            //         { manager: { $in: req.user.id } },// trae solo los cursos que el usuario creo
+            //     ]
+
+            // }).populate('department');
             res.json(courses)
         } catch (error) {
             console.log(error)
@@ -44,8 +53,22 @@ export class CouseController {
     }
 
     static updateCourse = async (req: Request, res: Response) => {
-
+        const { id } = req.params
         try {
+            const course = await Course.findById(id)
+
+
+            if (!course) {
+                const error = new Error('Proyecto no encontrado')
+                res.status(404).json({ error: error.message })
+                return
+            }
+
+            if (req.course.manager.toString() !== req.user.id.toString()) {
+                const error = new Error('Solo el creador del curso puede actualizar el curso')
+                res.status(404).json({ error: error.message })
+                return
+            }
             req.course.courseName = req.body.courseName
             req.course.description = req.body.description
             req.course.department = req.body.department
@@ -60,6 +83,12 @@ export class CouseController {
 
     static deleteCourse = async (req: Request, res: Response) => {
         try {
+
+            if (req.course.manager.toString() !== req.user.id.toString()) {
+                const error = new Error('Solo el creador del curso puede eliminar el curso')
+                res.status(404).json({ error: error.message })
+                return
+            }
 
             await req.course.deleteOne()
             res.send('Curso eliminado con éxito')
