@@ -22,7 +22,9 @@ export class CouseController {
 
     static getAllCourses = async (req: Request, res: Response) => {
         try {
-            const courses = await Course.find({}).populate('department');
+            const courses = await Course.find({})
+                .populate('department')
+                .populate('manager', 'name email');
             // const courses = await Course.find({
             //     $or: [
             //         { manager: { $in: req.user.id } },// trae solo los cursos que el usuario creo
@@ -53,13 +55,13 @@ export class CouseController {
     }
 
     static updateCourse = async (req: Request, res: Response) => {
-        const { id } = req.params
+        const { courseId } = req.params
         try {
-            const course = await Course.findById(id)
+            const course = await Course.findById(courseId)
 
 
             if (!course) {
-                const error = new Error('Proyecto no encontrado')
+                const error = new Error('Curso no encontrado')
                 res.status(404).json({ error: error.message })
                 return
             }
