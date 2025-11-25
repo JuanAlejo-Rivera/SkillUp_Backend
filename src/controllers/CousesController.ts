@@ -42,10 +42,13 @@ export class CouseController {
 
         try {
             const course = await Course.findById(id)
+                .populate('department')
+                .populate('manager', 'name email');
 
             if (!course) {
                 const error = new Error('Curso no encontrado')
                 res.status(404).json({ error: error.message })
+                return
             }
 
             res.json(course)

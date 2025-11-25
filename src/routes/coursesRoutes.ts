@@ -3,7 +3,7 @@ import { body, param } from "express-validator";
 import { CouseController } from "../controllers/CousesController";
 import { handleInputErrors } from "../middleware/validation";
 import { SectionsController } from "../controllers/SectionsController";
-import { validateCourseExists } from "../middleware/courses";
+import { hasAutorization, validateCourseExists } from "../middleware/courses";
 import { sectionBelongsToCourse, validateSectionExists } from "../middleware/section";
 import { LeassonController } from "../controllers/LessonController";
 import { validateLessonExists } from "../middleware/lesson";
@@ -28,7 +28,7 @@ router.post('/',
     CouseController.createCourse
 )
 
-router.get('/' ,CouseController.getAllCourses)
+router.get('/', CouseController.getAllCourses)
 
 router.get('/:id',
     param('id').isMongoId().withMessage('ID no valido'),
@@ -39,6 +39,7 @@ router.get('/:id',
 router.param('courseId', validateCourseExists)
 
 router.put('/:courseId',
+    hasAutorization,
     param('courseId').isMongoId().withMessage('ID no valido'),
 
     body('courseName')
@@ -53,6 +54,7 @@ router.put('/:courseId',
     CouseController.updateCourse
 )
 router.delete('/:courseId',
+    hasAutorization,
     param('courseId').isMongoId().withMessage('ID no valido'),
 
     handleInputErrors,
@@ -66,6 +68,7 @@ router.delete('/:courseId',
 router.param('sectionId', validateSectionExists)
 
 router.post('/:courseId/sections',
+    hasAutorization,
     body('title')
         .notEmpty().withMessage('El nombre del curso es obligatorio'),
     body('description')
@@ -87,6 +90,7 @@ router.get('/:courseId/sections/:sectionId',
 )
 
 router.put('/:courseId/sections/:sectionId',
+    hasAutorization,
     param('sectionId').isMongoId().withMessage('ID no valido'),
     body('title')
         .notEmpty().withMessage('El nombre de la sección es obligatorio'),
