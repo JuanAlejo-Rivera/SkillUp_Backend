@@ -24,7 +24,8 @@ export class CouseController {
         try {
             const courses = await Course.find({})
                 .populate('department')
-                .populate('manager', 'name email');
+                .populate('manager', 'name email')
+                .populate('lastEditedBy', 'name email');
             // const courses = await Course.find({
             //     $or: [
             //         { manager: { $in: req.user.id } },// trae solo los cursos que el usuario creo
@@ -43,7 +44,8 @@ export class CouseController {
         try {
             const course = await Course.findById(id)
                 .populate('department')
-                .populate('manager', 'name email');
+                .populate('manager', 'name email')
+                .populate('lastEditedBy', 'name email');
 
             if (!course) {
                 const error = new Error('Curso no encontrado')
@@ -60,6 +62,7 @@ export class CouseController {
     static updateCourse = async (req: Request, res: Response) => {
         const { courseId } = req.params
         try {
+            req.body.lastEditedBy = req.user.id
             const course = await Course.findById(courseId)
 
 

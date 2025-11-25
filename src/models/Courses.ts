@@ -14,6 +14,7 @@ export interface Icourse extends Document {
     department: mongoose.Types.ObjectId;
     sections: Types.ObjectId[]
     manager: PopulatedDoc<IUser & Document>
+    lastEditedBy?: PopulatedDoc<IUser & Document>
 }
 
 
@@ -42,6 +43,10 @@ const courseSchema: Schema = new Schema({
         }
     ],
     manager: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+    },
+    lastEditedBy: {
         type: Schema.Types.ObjectId,
         ref: "User",
     },
