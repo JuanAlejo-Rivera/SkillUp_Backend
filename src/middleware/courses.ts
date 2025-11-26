@@ -31,10 +31,12 @@ export async function validateCourseExists(req: Request, res: Response, next: Ne
 }
 
 export function hasAutorization(req: Request, res: Response, next: NextFunction) {
-    if (req.user.id.toString() !== req.course.manager.toString()) {
-        const error = new Error('Acción no valida')
-        res.status(400).json({ error: error.message })
+    // Admin puede realizar cualquier acción, otros solo en sus propios cursos
+    if (req.user.role === 'admin' || req.user.id.toString() === req.course.manager.toString()) {
+        next()
+    } else {
+        const error = new Error('No tienes permisos para realizar esta acción')
+        res.status(403).json({ error: error.message })
         return
     }
-    next()
 }

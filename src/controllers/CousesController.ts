@@ -72,14 +72,16 @@ export class CouseController {
                 return
             }
 
-            if (req.course.manager.toString() !== req.user.id.toString()) {
-                const error = new Error('Solo el creador del curso puede actualizar el curso')
-                res.status(404).json({ error: error.message })
+            // Admin puede editar cualquier curso, otros solo sus propios cursos
+            if (req.user.role !== 'admin' && req.course.manager.toString() !== req.user.id.toString()) {
+                const error = new Error('No tienes permisos para actualizar este curso')
+                res.status(403).json({ error: error.message })
                 return
             }
             req.course.courseName = req.body.courseName
             req.course.description = req.body.description
             req.course.department = req.body.department
+            req.course.lastEditedBy = req.user.id
 
             await req.course.save()
             res.send('Curso actualizado con éxito')
@@ -91,10 +93,10 @@ export class CouseController {
 
     static deleteCourse = async (req: Request, res: Response) => {
         try {
-
-            if (req.course.manager.toString() !== req.user.id.toString()) {
-                const error = new Error('Solo el creador del curso puede eliminar el curso')
-                res.status(404).json({ error: error.message })
+            // Admin puede eliminar cualquier curso, otros solo sus propios cursos
+            if (req.user.role !== 'admin' && req.course.manager.toString() !== req.user.id.toString()) {
+                const error = new Error('No tienes permisos para eliminar este curso')
+                res.status(403).json({ error: error.message })
                 return
             }
 

@@ -31,7 +31,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
         //esto verifica que el usuario exista en la base de datos
         if (typeof decoded === 'object' && decoded.id) {// verifica que sea un objeto y que exista el id
-            const user = await User.findById(decoded.id).select('_id name email')
+            const user = await User.findById(decoded.id).select('_id name email role')
             if (user) {
                 req.user = user;
                 next();
