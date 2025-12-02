@@ -1,4 +1,5 @@
 import Department from "../models/Departments"
+import Courses from "../models/Courses"
 import { Request, Response } from "express";
 
 export class DepartmentsController {
@@ -33,6 +34,15 @@ export class DepartmentsController {
 
             if (!department) {
                 return res.status(404).json({ error: 'Departamento no encontrado' })
+            }
+
+            // Verificar si el departamento está siendo usado por algún curso
+            const coursesUsingDepartment = await Courses.countDocuments({ department: departmentId })
+
+            if (coursesUsingDepartment > 0) {
+                return res.status(400).json({ 
+                    error: `No se puede eliminar el departamento porque está siendo usado por ${coursesUsingDepartment} curso(s)` 
+                })
             }
 
             await department.deleteOne()
