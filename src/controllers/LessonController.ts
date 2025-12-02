@@ -34,7 +34,7 @@ export class LeassonController {
 
     static getLessonsBySection = async (req: Request, res: Response) => {
         try {
-            const lessons = await Lesson.find({ section: req.params.sectionId })
+            const lessons = await Lesson.find({ section: req.params.sectionId }).sort({ order: 1 })
             res.json(lessons)
         } catch (error) {
             res.status(500).json({ error: 'Hubo un error al obtener las lecciones' })
@@ -98,6 +98,23 @@ export class LeassonController {
         } catch (error) {
             res.status(500).json({ error: 'Hubo un error al eliminar la lección' })
 
+        }
+    }
+
+    static updateLessonsOrder = async (req: Request, res: Response) => {
+        try {
+            const { lessons } = req.body; // Array de { id: string, order: number }
+            
+            // Actualizar el orden de cada lección
+            await Promise.all(
+                lessons.map(async (item: { id: string; order: number }) => {
+                    await Lesson.findByIdAndUpdate(item.id, { order: item.order });
+                })
+            );
+
+            res.send('Orden de lecciones actualizado con éxito');
+        } catch (error) {
+            res.status(500).json({ error: 'Hubo un error al actualizar el orden de las lecciones' });
         }
     }
 }

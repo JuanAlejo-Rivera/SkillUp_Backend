@@ -23,7 +23,7 @@ export class SectionsController {
 
     static getSectionsByCourse = async (req: Request, res: Response) => {
         try {
-            const sections = await Section.find({ course: req.course.id }).populate('lessons');
+            const sections = await Section.find({ course: req.course.id }).populate('lessons').sort({ order: 1 });
             res.json(sections)
         } catch (error) {
             console.log(error)
@@ -64,6 +64,23 @@ export class SectionsController {
             res.send('Sección eliminada con éxito');
         } catch (error) {
 
+        }
+    }
+
+    static updateSectionsOrder = async (req: Request, res: Response) => {
+        try {
+            const { sections } = req.body; // Array de { id: string, order: number }
+            
+            // Actualizar el orden de cada sección
+            await Promise.all(
+                sections.map(async (item: { id: string; order: number }) => {
+                    await Section.findByIdAndUpdate(item.id, { order: item.order });
+                })
+            );
+
+            res.send('Orden de secciones actualizado con éxito');
+        } catch (error) {
+            res.status(500).json({ error: 'Hubo un error al actualizar el orden de las secciones' });
         }
     }
 

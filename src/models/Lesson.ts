@@ -7,6 +7,7 @@ export interface ILesson extends Document {
     fileUrl?: string[];
     imageUrl?: string[];
     section: Types.ObjectId;
+    order: number;
 }
 
 const lessonSchema: Schema = new Schema(
@@ -37,6 +38,10 @@ const lessonSchema: Schema = new Schema(
             ref: "Section",
             required: true,
         },
+        order: {
+            type: Number,
+            default: 0
+        }
     },
     { timestamps: true }
 );

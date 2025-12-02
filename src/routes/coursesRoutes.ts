@@ -106,6 +106,13 @@ router.delete('/:courseId/sections/:sectionId',
     handleInputErrors,
     SectionsController.deleteSection
 )
+//para actualizar el orden de las secciones
+router.patch('/:courseId/sections/order',
+    hasAutorization,
+    body('sections').isArray().withMessage('Sections debe ser un array'),
+    handleInputErrors,
+    SectionsController.updateSectionsOrder
+)
 
 /**Routes for leassons */
 router.param('sectionId', sectionBelongsToCourse)
@@ -185,6 +192,13 @@ router.delete('/:courseId/sections/:sectionId/lessons/:lessonId',
     param('lessonId').isMongoId().withMessage('ID no valido'),
     handleInputErrors,
     LeassonController.deleteLesson
+)
+//para actualizar el orden de las lecciones
+router.patch('/:courseId/sections/:sectionId/lessons/order',
+    hasAutorization,
+    body('lessons').isArray().withMessage('Lessons debe ser un array'),
+    handleInputErrors,
+    LeassonController.updateLessonsOrder
 )
 
 export default router;

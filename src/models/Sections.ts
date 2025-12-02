@@ -6,6 +6,7 @@ export interface ISection extends Document {
     description: string;
     course: Types.ObjectId; 
     lessons: Types.ObjectId[];
+    order: number;
 }
 
 const sectionSchema: Schema = new Schema({
@@ -28,7 +29,11 @@ const sectionSchema: Schema = new Schema({
             type: Schema.Types.ObjectId,
             ref: "Lesson" // referencia al modelo Lesson
         }
-    ]
+    ],
+    order: {
+        type: Number,
+        default: 0
+    }
 
 }, { timestamps: true });
 
