@@ -296,4 +296,67 @@ export class AuthController {
         res.send('Contraseña correcta');
     }
 
+    static updateUserRole = async (req: Request, res: Response) => {
+        try {
+            // Lista de super administradores que pueden nombrar otros admins
+            const superAdmins = ['rootmail@mail.com'];
+
+            // Verificar que el usuario autenticado sea admin
+            if (req.user.role !== 'admin') {
+                const error = new Error('No tienes permisos para realizar esta acción');
+                res.status(403).json({ error: error.message });
+                return;
+            }
+
+            const { email, newRole } = req.body;
+
+            // Validar que el nuevo rol sea válido
+            if (!['admin', 'teacher', 'user'].includes(newRole)) {
+                const error = new Error('Rol no válido');
+                res.status(400).json({ error: error.message });
+                return;
+            }
+
+            // Si se intenta asignar el rol de admin, verificar que sea un super admin
+            if (newRole === 'admin' && !superAdmins.includes(req.user.email)) {
+                const error = new Error('Solo los super administradores pueden nombrar otros administradores');
+                res.status(403).json({ error: error.message });
+                return;
+            }
+
+            // Buscar el usuario por email
+            const user = await User.findOne({ email });
+            if (!user) {
+                const error = new Error('Usuario no encontrado');
+                res.status(404).json({ error: error.message });
+                return;
+            }
+
+            // Actualizar el rol
+            user.role = newRole;
+            await user.save();
+
+            res.send('Rol actualizado correctamente');
+        } catch (error) {
+            res.status(500).json({ error: 'Error al actualizar el rol' });
+        }
+    }
+
+    static getAllUsers = async (req: Request, res: Response) => {
+        try {
+            // Verificar que el usuario autenticado sea admin
+            if (req.user.role !== 'admin') {
+                const error = new Error('No tienes permisos para realizar esta acción');
+                res.status(403).json({ error: error.message });
+                return;
+            }
+
+            // Obtener todos los usuarios (solo email, nombre y rol)
+            const users = await User.find().select('email name role');
+            res.json(users);
+        } catch (error) {
+            res.status(500).json({ error: 'Error al obtener usuarios' });
+        }
+    }
+
 }

@@ -119,6 +119,21 @@ router.post('/check-password',
     AuthController.checkPassword
 )
 
+router.patch('/update-role',
+    authenticate,
+    body('email')
+        .isEmail().withMessage('E-mail no válido'),
+    body('newRole')
+        .isIn(['admin', 'teacher', 'user']).withMessage('Rol no válido'),
+    handleInputErrors,
+    AuthController.updateUserRole
+)
+
+router.get('/all-users',
+    authenticate,
+    AuthController.getAllUsers
+)
+
 export default router;
 
 
