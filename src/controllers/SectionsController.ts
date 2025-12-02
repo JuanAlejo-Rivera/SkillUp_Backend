@@ -58,12 +58,26 @@ export class SectionsController {
 
     static deleteSection = async (req: Request, res: Response) => {
         try {
+            // Admin y profesores pueden eliminar secciones, pero otros usuarios no
+            if (req.user.role !== 'admin' && req.user.role !== 'teacher') {
+                const error = new Error('No tienes permisos para eliminar esta sección')
+                res.status(403).json({ error: error.message })
+                return
+            }
+
+            // Si no es admin, verificar que sea el creador del curso
+            if (req.user.role !== 'admin' && req.course.manager.toString() !== req.user.id.toString()) {
+                const error = new Error('Solo el creador del curso puede eliminar secciones')
+                res.status(403).json({ error: error.message })
+                return
+            }
+
             req.course.sections = req.course.sections.filter(section => section.toString() !== req.section.id.toString())
             await Promise.allSettled([req.section.deleteOne(), req.course.save()])
 
             res.send('Sección eliminada con éxito');
         } catch (error) {
-
+            res.status(500).json({ error: 'Hubo un error al eliminar la sección' })
         }
     }
 

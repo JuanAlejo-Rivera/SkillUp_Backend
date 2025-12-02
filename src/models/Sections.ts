@@ -1,5 +1,6 @@
 // Section.ts
 import mongoose, { Schema, Document, Types } from "mongoose";
+import Lesson from "./Lesson";
 
 export interface ISection extends Document {
     title: string;
@@ -36,6 +37,14 @@ const sectionSchema: Schema = new Schema({
     }
 
 }, { timestamps: true });
+
+//Middleware para eliminar lecciones asociadas cuando se elimina una sección
+sectionSchema.pre('deleteOne', {document: true}, async function(){ 
+    const lessonId = this._id; 
+    if(!lessonId) return;
+    await Lesson.deleteMany({section: lessonId}) //elimina las lecciones asociadas a esta sección
+})
+
 
 const Section = mongoose.model<ISection>("Section", sectionSchema);
 export default Section;
