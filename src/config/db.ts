@@ -1,4 +1,3 @@
-import { Connection } from './../../node_modules/mongodb/src/cmap/connection';
 import mongoose from "mongoose";
 import colors from "colors";
 import { exit } from 'node:process';
