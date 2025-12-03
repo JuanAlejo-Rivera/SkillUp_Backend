@@ -13,7 +13,7 @@
         "resolveJsonModule": true,
         "moduleResolution": "node",
         "noEmitOnError": false,
-        "suppressImplicitAnyIndexErrors": true
+        
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "dist"],
