@@ -28,7 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "kerberos": "^2.2.2",
     "mongodb": "^5.7.0",
-    "mongodb-client-encryption": "^6.5.0",
+    "mongodb-client-encryption": "^2.9.0",
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.10"
@@ -38,6 +38,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.10.0",
     "@types/nodemailer": "^7.0.3",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
