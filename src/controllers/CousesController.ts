@@ -1,50 +1,8 @@
 import type { Request, Response } from "express";
 import Course from "../models/Courses";
 import { deleteCourseAssets } from "../utils/deleteAssets";
-import Lesson from "../models/Lesson";
-import { extractPublicId, getResourceType } from "../utils/cloudinary";
-
 
 export class CouseController {
-
-    // Endpoint temporal para debug - ver formato de URLs
-    static debugLesson = async (req: Request, res: Response) => {
-        try {
-            const lesson = await Lesson.findOne({
-                $or: [
-                    { videoUrl: { $exists: true, $ne: [] } },
-                    { fileUrl: { $exists: true, $ne: [] } },
-                    { imageUrl: { $exists: true, $ne: [] } }
-                ]
-            }).limit(1);
-
-            if (!lesson) {
-                res.json({ message: 'No se encontraron lecciones con archivos' });
-                return;
-            }
-
-            // Procesar URLs para mostrar cómo se extraerán
-            const processUrl = (url: string) => {
-                const resourceType = getResourceType(url);
-                const includeExtension = (resourceType === 'raw');
-                return {
-                    original: url,
-                    publicId: extractPublicId(url, includeExtension),
-                    resourceType: resourceType
-                };
-            };
-
-            res.json({
-                lessonId: lesson._id,
-                title: lesson.title,
-                videos: (lesson.videoUrl || []).map(processUrl),
-                files: (lesson.fileUrl || []).map(processUrl),
-                images: (lesson.imageUrl || []).map(processUrl)
-            });
-        } catch (error) {
-            res.status(500).json({ error: 'Error al obtener lección de prueba' });
-        }
-    }
 
     static createCourse = async (req: Request, res: Response) => {
 
