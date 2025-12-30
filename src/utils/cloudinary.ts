@@ -87,7 +87,7 @@ export const deleteCloudinaryAsset = async (url: string): Promise<boolean> => {
         // Verificar configuración
         ensureCloudinaryConfig();
         
-        console.log(`\n🔍 Procesando URL: ${url}`);
+        console.log(`\nProcesando URL: ${url}`);
         
         const resourceType = getResourceType(url);
         
@@ -96,31 +96,31 @@ export const deleteCloudinaryAsset = async (url: string): Promise<boolean> => {
         const publicId = extractPublicId(url, includeExtension);
         
         if (!publicId) {
-            console.warn(`❌ No se pudo extraer public_id de la URL: ${url}`);
+            console.warn(`No se pudo extraer public_id de la URL: ${url}`);
             return false;
         }
         
-        console.log(`📤 Intentando eliminar de Cloudinary:`);
-        console.log(`   - Public ID: ${publicId}`);
-        console.log(`   - Resource Type: ${resourceType}`);
+        console.log(`Intentando eliminar de Cloudinary:`);
+        console.log(`- Public ID: ${publicId}`);
+        console.log(`- Resource Type: ${resourceType}`);
         
         const result = await cloudinary.uploader.destroy(publicId, {
             resource_type: resourceType,
             invalidate: true
         });
         
-        console.log(`📥 Respuesta de Cloudinary:`, result);
+        console.log(`Respuesta de Cloudinary:`, result);
         
         if (result.result === 'ok' || result.result === 'not found') {
-            console.log(`✅ Asset eliminado exitosamente: ${publicId}`);
+            console.log(`Asset eliminado exitosamente: ${publicId}`);
             return true;
         } else {
-            console.warn(`⚠️ Advertencia al eliminar ${publicId}:`, result);
+            console.warn(`Advertencia al eliminar ${publicId}:`, result);
             return false;
         }
         
     } catch (error) {
-        console.error(`❌ Error al eliminar asset de Cloudinary (${url}):`, error);
+        console.error(`Error al eliminar asset de Cloudinary (${url}):`, error);
         return false;
     }
 };

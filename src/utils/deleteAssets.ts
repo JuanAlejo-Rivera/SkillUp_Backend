@@ -10,12 +10,12 @@ import { deleteMultipleCloudinaryAssets } from "./cloudinary";
  */
 export const deleteLessonAssets = async (lessonId: string): Promise<number> => {
     try {
-        console.log(`\n🗑️  Iniciando eliminación de assets para lección: ${lessonId}`);
+        console.log(`\nIniciando eliminación de assets para lección: ${lessonId}`);
         
         const lesson = await Lesson.findById(lessonId);
         
         if (!lesson) {
-            console.warn(`⚠️  Lección no encontrada: ${lessonId}`);
+            console.warn(`Lección no encontrada: ${lessonId}`);
             return 0;
         }
 
@@ -26,27 +26,27 @@ export const deleteLessonAssets = async (lessonId: string): Promise<number> => {
             ...(lesson.imageUrl || [])
         ];
 
-        console.log(`📋 URLs encontradas en la lección "${lesson.title}":`);
-        console.log(`   - Videos: ${lesson.videoUrl?.length || 0}`);
-        console.log(`   - Archivos: ${lesson.fileUrl?.length || 0}`);
-        console.log(`   - Imágenes: ${lesson.imageUrl?.length || 0}`);
-        console.log(`   - Total: ${allUrls.length}`);
+        console.log(`URLs encontradas en la lección "${lesson.title}":`);
+        console.log(`- Videos: ${lesson.videoUrl?.length || 0}`);
+        console.log(`- Archivos: ${lesson.fileUrl?.length || 0}`);
+        console.log(`- Imágenes: ${lesson.imageUrl?.length || 0}`);
+        console.log(`- Total: ${allUrls.length}`);
 
         if (allUrls.length === 0) {
-            console.log(`ℹ️  La lección ${lessonId} no tiene assets para eliminar`);
+            console.log(`La lección ${lessonId} no tiene assets para eliminar`);
             return 0;
         }
 
-        console.log(`\n🚀 Eliminando ${allUrls.length} assets de la lección "${lesson.title}"`);
+        console.log(`\nEliminando ${allUrls.length} assets de la lección "${lesson.title}"`);
         
         const deletedCount = await deleteMultipleCloudinaryAssets(allUrls);
         
-        console.log(`\n✅ Resultado: ${deletedCount}/${allUrls.length} assets eliminados de Cloudinary\n`);
+        console.log(`\nResultado: ${deletedCount}/${allUrls.length} assets eliminados de Cloudinary\n`);
         
         return deletedCount;
         
     } catch (error) {
-        console.error(`❌ Error al eliminar assets de la lección ${lessonId}:`, error);
+        console.error(`Error al eliminar assets de la lección ${lessonId}:`, error);
         return 0;
     }
 };
