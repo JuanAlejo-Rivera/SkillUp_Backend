@@ -1,5 +1,6 @@
 import { json, Request, Response } from "express";
 import Lesson from "../models/Lesson";
+import { deleteLessonAssets } from "../utils/deleteAssets";
 
 
 
@@ -90,6 +91,10 @@ export class LeassonController {
 
     static deleteLesson = async (req: Request, res: Response) => {
         try {
+            // Primero eliminar los assets de Cloudinary
+            await deleteLessonAssets(req.lesson.id.toString());
+            
+            // Luego eliminar la lección de la base de datos
             req.section.lessons = req.section.lessons.filter(lesson => lesson.toString() !== req.lesson.id.toString())
 
             await Promise.allSettled([req.lesson!.deleteOne(), req.section.save()])

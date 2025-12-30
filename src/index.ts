@@ -1,3 +1,7 @@
+// IMPORTANTE: Cargar variables de entorno ANTES que cualquier otra cosa
+import dotenv from "dotenv";
+dotenv.config();
+
 import server from "./server";
 import colors from "colors";
 

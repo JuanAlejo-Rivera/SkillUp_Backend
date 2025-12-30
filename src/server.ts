@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import { corsConfig } from "./config/cors";
 import { conenctDB } from "./config/db";
@@ -7,7 +6,7 @@ import coursesRoutes from "./routes/coursesRoutes";
 import authRoutes from "./routes/authRoutes";
 import departmentsRoutes from "./routes/departmentsRoutes";
 
-dotenv.config();
+// dotenv ya se cargó en index.ts
 conenctDB();
 
 const app = express();

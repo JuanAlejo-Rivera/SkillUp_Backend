@@ -1,6 +1,7 @@
 import { json, Request, Response } from "express";
 import Section from "../models/Sections";
 import Course from "../models/Courses";
+import { deleteSectionAssets } from "../utils/deleteAssets";
 
 
 
@@ -72,6 +73,10 @@ export class SectionsController {
                 return
             }
 
+            // Primero eliminar los assets de Cloudinary de todas las lecciones de la sección
+            await deleteSectionAssets(req.section.id.toString());
+
+            // Luego eliminar la sección de la base de datos
             req.course.sections = req.course.sections.filter(section => section.toString() !== req.section.id.toString())
             await Promise.allSettled([req.section.deleteOne(), req.course.save()])
 

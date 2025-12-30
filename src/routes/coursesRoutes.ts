@@ -14,6 +14,9 @@ const router = Router()
 
 /** Routes for courses */
 
+// Endpoint temporal para debug (SIN autenticación para prueba rápida)
+router.get('/debug/lesson-urls', CouseController.debugLesson)
+
 router.use(authenticate)// todas las rutas de este router pasaran por este middleware, para estar protegidas
 
 router.post('/',
