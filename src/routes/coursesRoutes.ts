@@ -201,4 +201,14 @@ router.patch('/:courseId/sections/:sectionId/lessons/order',
     LeassonController.updateLessonsOrder
 )
 
+// Eliminar un archivo individual de una lección y cloudinary
+router.delete('/:courseId/sections/:sectionId/lessons/:lessonId/files',
+    hasAutorization,
+    param('lessonId').isMongoId().withMessage('ID no valido'),
+    body('fileUrl').notEmpty().withMessage('La URL del archivo es obligatoria'),
+    body('fileType').isIn(['videoUrl', 'fileUrl', 'imageUrl']).withMessage('Tipo de archivo inválido'),
+    handleInputErrors,
+    LeassonController.deleteFile
+)
+
 export default router;

@@ -1,6 +1,7 @@
 import { json, Request, Response } from "express";
 import Lesson from "../models/Lesson";
 import { deleteLessonAssets } from "../utils/deleteAssets";
+import { deleteCloudinaryAsset } from "../utils/cloudinary";
 
 
 
@@ -120,6 +121,54 @@ export class LeassonController {
             res.send('Orden de lecciones actualizado con éxito');
         } catch (error) {
             res.status(500).json({ error: 'Hubo un error al actualizar el orden de las lecciones' });
+        }
+    }
+
+    static deleteFile = async (req: Request, res: Response) => {
+        try {
+            const { fileUrl, fileType } = req.body;
+
+            if (!fileUrl || !fileType) {
+                const error = new Error('URL del archivo y tipo son obligatorios');
+                res.status(400).json({ error: error.message });
+                return;
+            }
+
+            // Validar que el tipo de archivo sea válido
+            if (!['videoUrl', 'fileUrl', 'imageUrl'].includes(fileType)) {
+                const error = new Error('Tipo de archivo inválido');
+                res.status(400).json({ error: error.message });
+                return;
+            }
+
+            // Verificar que el archivo pertenece a esta lección
+            const lesson = req.lesson;
+            const fileArray = lesson[fileType as 'videoUrl' | 'fileUrl' | 'imageUrl'] || [];
+            
+            if (!fileArray.includes(fileUrl)) {
+                const error = new Error('El archivo no pertenece a esta lección');
+                res.status(404).json({ error: error.message });
+                return;
+            }
+
+            // Eliminar el archivo de Cloudinary
+            const deleted = await deleteCloudinaryAsset(fileUrl);
+            
+            if (!deleted) {
+                console.warn(`No se pudo eliminar el archivo de Cloudinary, pero se continuará con la eliminación de la BD`);
+            }
+
+            // Eliminar el archivo del array en la base de datos
+            lesson[fileType as 'videoUrl' | 'fileUrl' | 'imageUrl'] = fileArray.filter(
+                (url: string) => url !== fileUrl
+            );
+
+            await lesson.save();
+
+            res.send('Archivo eliminado con éxito');
+        } catch (error) {
+            console.error('Error al eliminar archivo:', error);
+            res.status(500).json({ error: 'Hubo un error al eliminar el archivo' });
         }
     }
 }
