@@ -48,32 +48,26 @@ export const extractPublicId = (url: string, includeExtension: boolean = false):
  * @returns 'image', 'video' o 'raw'
  */
 export const getResourceType = (url: string): 'image' | 'video' | 'raw' => {
-    // Primero verificar por el tipo en la URL
+    // La URL es la fuente de verdad - verificar PRIMERO dónde está almacenado
     if (url.includes('/video/upload/')) return 'video';
     if (url.includes('/raw/upload/')) return 'raw';
+    if (url.includes('/image/upload/')) return 'image';  // ← Confiar en la URL
     
-    // Extraer la extensión del archivo
-    const extension = url.split('.').pop()?.toLowerCase().split('?')[0]; // Remover query params si existen
+    // Si no hay indicador en la URL, usar la extensión
+    const extension = url.split('.').pop()?.toLowerCase().split('?')[0];
     
-    // Extensiones de documento siempre son 'raw', incluso si están en /image/upload/
-    if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'zip', 'rar'].includes(extension || '')) {
-        return 'raw';
-    }
-    
-    // Extensiones de video
     if (['mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm', 'm4v', 'mpeg', 'mpg'].includes(extension || '')) {
         return 'video';
     }
     
-    // Extensiones de imagen
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'tiff'].includes(extension || '')) {
         return 'image';
     }
     
-    // Si la URL dice /image/upload/ y no coincide con documentos/videos, asumir image
-    if (url.includes('/image/upload/')) return 'image';
+    if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'zip', 'rar'].includes(extension || '')) {
+        return 'raw';
+    }
     
-    // Por defecto, raw para archivos desconocidos
     return 'raw';
 };
 
@@ -91,8 +85,13 @@ export const deleteCloudinaryAsset = async (url: string): Promise<boolean> => {
         
         const resourceType = getResourceType(url);
         
-        // Para archivos raw, incluir la extensión en el public_id
-        const includeExtension = (resourceType === 'raw');
+        // Determinar si debe incluir extensión:
+        // - Para raw: siempre incluir extensión
+        // - Para image con extensión de documento (.pdf, .doc): incluir extensión
+        const extension = url.split('.').pop()?.toLowerCase().split('?')[0];
+        const isDocument = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv'].includes(extension || '');
+        const includeExtension = (resourceType === 'raw') || (resourceType === 'image' && isDocument);
+        
         const publicId = extractPublicId(url, includeExtension);
         
         if (!publicId) {
@@ -104,18 +103,34 @@ export const deleteCloudinaryAsset = async (url: string): Promise<boolean> => {
         console.log(`- Public ID: ${publicId}`);
         console.log(`- Resource Type: ${resourceType}`);
         
-        const result = await cloudinary.uploader.destroy(publicId, {
+        let result = await cloudinary.uploader.destroy(publicId, {
             resource_type: resourceType,
             invalidate: true
         });
         
         console.log(`Respuesta de Cloudinary:`, result);
         
-        if (result.result === 'ok' || result.result === 'not found') {
-            console.log(`Asset eliminado exitosamente: ${publicId}`);
+        // Si no se encuentra, intentar sin la extensión
+        if (result.result === 'not found' && publicId.includes('.')) {
+            const publicIdWithoutExt = publicId.substring(0, publicId.lastIndexOf('.'));
+            console.log(`⚠️ Reintentando sin extensión: ${publicIdWithoutExt}`);
+            
+            result = await cloudinary.uploader.destroy(publicIdWithoutExt, {
+                resource_type: resourceType,
+                invalidate: true
+            });
+            
+            console.log(`Resultado:`, result);
+        }
+        
+        if (result.result === 'ok') {
+            console.log(`✅ Asset eliminado exitosamente`);
+            return true;
+        } else if (result.result === 'not found') {
+            console.log(`Asset no encontrado en Cloudinary (puede que ya fue eliminado)`);
             return true;
         } else {
-            console.warn(`Advertencia al eliminar ${publicId}:`, result);
+            console.warn(`❌ Error al eliminar:`, result);
             return false;
         }
         
